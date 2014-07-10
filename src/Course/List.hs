@@ -72,8 +72,9 @@ headOr ::
   a
   -> List a
   -> a
-headOr =
-  error "todo"
+headOr x Nil = x
+headOr _ (h :. _) = h
+  
 
 -- | The product of the elements of a list.
 --
@@ -85,8 +86,7 @@ headOr =
 product ::
   List Int
   -> Int
-product =
-  error "todo"
+product = foldRight (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -100,8 +100,7 @@ product =
 sum ::
   List Int
   -> Int
-sum =
-  error "todo"
+sum = foldRight (+) 0
 
 -- | Return the length of the list.
 --
@@ -112,8 +111,7 @@ sum =
 length ::
   List a
   -> Int
-length =
-  error "todo"
+length = foldRight (\a b -> b+1) 0
 
 -- | Map the given function on each element of the list.
 --
@@ -127,8 +125,7 @@ map ::
   (a -> b)
   -> List a
   -> List b
-map =
-  error "todo"
+map f = foldRight (\a x -> f a :. x) Nil
 
 -- | Return elements satisfying the given predicate.
 --
@@ -144,8 +141,7 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter =
-  error "todo"
+filter p = foldRight (\a x -> if p a then a :. x else x) Nil
 
 -- | Append two lists to a new list.
 --
@@ -163,8 +159,7 @@ filter =
   List a
   -> List a
   -> List a
-(++) =
-  error "todo"
+(++) xs ys = foldRight (\a x -> a :. x) ys xs
 
 infixr 5 ++
 
@@ -181,8 +176,7 @@ infixr 5 ++
 flatten ::
   List (List a)
   -> List a
-flatten =
-  error "todo"
+flatten = foldRight (++) Nil
 
 -- | Map a function then flatten to a list.
 --

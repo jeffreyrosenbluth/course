@@ -72,7 +72,7 @@ headOr ::
   a
   -> List a
   -> a
-headOr x Nil = x
+headOr x Nil      = x
 headOr _ (h :. _) = h
   
 
@@ -111,7 +111,7 @@ sum = foldRight (+) 0
 length ::
   List a
   -> Int
-length = foldRight (\a b -> b+1) 0
+length = foldRight (\_ b -> b+1) 0
 
 -- | Map the given function on each element of the list.
 --
@@ -192,8 +192,7 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap =
-  error "todo"
+flatMap f = flatten . map f
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -202,8 +201,7 @@ flatMap =
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain =
-  error "todo"
+flattenAgain = flatMap id
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -230,8 +228,11 @@ flattenAgain =
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
-  error "todo"
+seqOptional Nil              = Full Nil
+seqOptional (Empty :. _)     = Empty
+seqOptional ((Full x) :. xs) =  case seqOptional xs of
+  Empty   -> Empty
+  Full xs' -> Full $ x :. xs'
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -253,8 +254,8 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo"
+find _ Nil       = Empty
+find p (x :. xs) = if p x then Full x else find p xs
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -272,8 +273,8 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 =
-  error "todo"
+lengthGT4 (_ :. _ :. _ :. _ :. _ ) = True
+lengthGT4 _                        = False
 
 -- | Reverse a list.
 --
@@ -289,8 +290,7 @@ lengthGT4 =
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo"
+reverse = foldLeft (\x a -> (a :. x)) Nil
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -304,8 +304,7 @@ produce ::
   (a -> a)
   -> a
   -> List a
-produce =
-  error "todo"
+produce f x = x :. produce f (f x)
 
 -- | Do anything other than reverse a list.
 -- Is it even possible?
@@ -319,8 +318,9 @@ produce =
 notReverse ::
   List a
   -> List a
-notReverse =
-  error "todo"
+notReverse Nil = Nil
+notReverse a@(_ :. Nil) = a
+notReverse xs = reverse xs
 
 largeList ::
   List Int

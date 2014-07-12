@@ -87,7 +87,7 @@ instance Bind List where
     (a -> List b)
     -> List a
     -> List b
-  f =<< Nil       = Nil
+  _ =<< Nil       = Nil
   f =<< (a :. as) = f a ++ (f =<< as)
 
 -- | Binds a function on an Optional.
@@ -99,7 +99,7 @@ instance Bind Optional where
     (a -> Optional b)
     -> Optional a
     -> Optional b
-  f =<< Empty  = Empty
+  _ =<< Empty  = Empty
   f =<< Full a = f a
 
 -- | Binds a function on the reader ((->) t).

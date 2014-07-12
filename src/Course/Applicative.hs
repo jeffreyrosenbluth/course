@@ -152,9 +152,10 @@ filtering p as = g <$> bs <*> pure as
   where
     bs = sequence . map p $ as
     g Nil _ = Nil
-    g (b:.bs) (a:.as)
-      | b         = a :. g bs as
-      | otherwise =  g bs as
+    g _ Nil = Nil
+    g (b:.bs') (a:.as')
+      | b         = a :. g bs' as'
+      | otherwise =  g bs' as'
 
 -----------------------
 -- SUPPORT LIBRARIES --

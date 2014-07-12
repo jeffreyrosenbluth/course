@@ -148,9 +148,13 @@ filtering ::
   (a -> f Bool)
   -> List a
   -> f (List a)
-filtering p = undefined  -- foldRight g (pure Nil)
-  -- where
-  -- fa `g` flb = (\x -> if  fa <*> flb
+filtering p as = g <$> bs <*> pure as
+  where
+    bs = sequence . map p $ as
+    g Nil _ = Nil
+    g (b:.bs) (a:.as)
+      | b         = a :. g bs as
+      | otherwise =  g bs as
 
 -----------------------
 -- SUPPORT LIBRARIES --

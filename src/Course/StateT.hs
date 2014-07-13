@@ -41,9 +41,7 @@ instance Functor f => Functor (StateT s f) where
     (a -> b)
     -> StateT s f a
     -> StateT s f b
-  f <$> a = StateT $ \t -> let as = runStateT a t
-                               g (x, y) = (f x, y)
-                           in  g <$> as
+  f <$> StateT a = StateT $ \t -> first f <$> a t
 
 -- | Implement the `Apply` instance for @StateT s f@ given a @Bind f@.
 --
@@ -58,9 +56,8 @@ instance Bind f => Apply (StateT s f) where
     StateT s f (a -> b)
     -> StateT s f a
     -> StateT s f b
-  f <*> a = StateT $ \t -> runStateT f t >>= \(g, s') ->
-                           runStateT a s' >>= \(a', s'') ->
-                           runStateT (g a') s''
+  StateT f <*> StateT a = StateT $ 
+     (\(g, s') -> first g <$> a s') <=< f
 
 -- | Implement the `Applicative` instance for @StateT s f@ given a @Applicative f@.
 --

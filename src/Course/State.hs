@@ -90,7 +90,7 @@ exec ::
   State s a
   -> s
   -> s
-exec f t = snd . runState f $  t
+exec f = snd . runState f 
 
 -- | Run the `State` seeded with `s` and retrieve the resulting value.
 --
@@ -99,10 +99,7 @@ eval ::
   State s a
   -> s
   -> a
-eval f t = fst . runState f $ t
-
--- | A `State` where the state also distributes into the produced value.
---
+eval f = fst . runState f
 -- >>> runState get 0
 -- (0,0)
 get ::
@@ -215,12 +212,10 @@ distinct xs = eval (filtering p xs) (S.empty)
 isHappy ::
   Integer
   -> Bool
-isHappy n = contains 1 (firstRepeat ns)
-  where
-    ns = produce square n
-
-square :: Integer -> Integer
-square n = P.fromIntegral $ sum d2s
-  where
-    d2s = map (\x -> x * x) ds
-    ds  = map digitToInt (show' n)
+isHappy = 
+    contains 1
+  . firstRepeat 
+  . produce ( toInteger
+            . sum 
+            . map (join (*) . digitToInt) 
+            . show')

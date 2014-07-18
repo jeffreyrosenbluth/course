@@ -643,8 +643,9 @@ instance Applicative MaybeListZipper where
 -- >>> id <<= (zipper [2,1] 3 [4,5])
 -- [[1] >2< [3,4,5],[] >1< [2,3,4,5]] >[2,1] >3< [4,5]< [[3,2,1] >4< [5],[4,3,2,1] >5< []]
 instance Extend ListZipper where
-  (<<=) =
-    error "todo"
+  f <<= z = ListZipper (unfoldr ((<$>) (\z' -> (f z', z')) . toOptional . moveLeft) z)
+                       (f z)
+                       (unfoldr ((<$>) (\z' -> (f z', z')) . toOptional . moveRight) z) 
 
 -- | Implement the `Extend` instance for `MaybeListZipper`.
 -- This instance will use the `Extend` instance for `ListZipper`.
@@ -656,8 +657,8 @@ instance Extend ListZipper where
 -- >>> id <<= (IsZ (zipper [2,1] 3 [4,5]))
 -- [[1] >2< [3,4,5],[] >1< [2,3,4,5]] >[2,1] >3< [4,5]< [[3,2,1] >4< [5],[4,3,2,1] >5< []]
 instance Extend MaybeListZipper where
-  (<<=) =
-    error "todo"
+  _ <<= IsNotZ = IsNotZ
+  f <<= IsZ z = IsZ (f . IsZ <<= z)
 
 -- | Implement the `Comonad` instance for `ListZipper`.
 -- This implementation returns the current focus of the zipper.
@@ -677,7 +678,8 @@ instance Comonad ListZipper where
 -- >>> traverse id (zipper [Full 1, Full 2, Full 3] (Full 4) [Empty, Full 6, Full 7])
 -- Empty
 instance Traversable ListZipper where
-  traverse = error "todo"
+  traverse f (ListZipper l c r) =
+    (ListZipper . reverse) <$> traverse f (reverse l) <*> f c <*> traverse f r
 
 -- | Implement the `Traversable` instance for `MaybeListZipper`.
 --
@@ -689,8 +691,8 @@ instance Traversable ListZipper where
 -- >>> traverse id (IsZ (zipper [Full 1, Full 2, Full 3] (Full 4) [Full 5, Full 6, Full 7]))
 -- Full [1,2,3] >4< [5,6,7]
 instance Traversable MaybeListZipper where
-  traverse =
-    error "todo"
+  traverse _ IsNotZ = pure IsNotZ
+  traverse f (IsZ z) = IsZ <$> traverse f z
 
 -----------------------
 -- SUPPORT LIBRARIES --
